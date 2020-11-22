@@ -23,11 +23,8 @@ namespace HubertFedorowiczPAINLab1
         private void newWindowToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SongsForm songsForm = new SongsForm( document );
-            SongsFormTree songsFormTree = new SongsFormTree(document);
             songsForm.MdiParent = this;
-            songsFormTree.MdiParent = this;
             songsForm.Show();
-            songsFormTree.Show();
             LayoutMdi(MdiLayout.TileVertical);
         }
 
@@ -39,6 +36,14 @@ namespace HubertFedorowiczPAINLab1
         private void MainForm_Resize(object sender, EventArgs e)
         { 
             LayoutMdi(MdiLayout.TileVertical);
+        }
+
+        private void newTreToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SongsFormTree songsFormTree = new SongsFormTree(document);
+            songsFormTree.MdiParent = this;
+            songsFormTree.Show();
+            LayoutMdi(MdiLayout.TileVertical);  
         }
     }
 }
