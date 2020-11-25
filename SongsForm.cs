@@ -140,7 +140,7 @@ namespace HubertFedorowiczPAINLab1
         private void SongsForm_Closing(object sender, FormClosingEventArgs e)
         {
             if (e.CloseReason == CloseReason.UserClosing)
-                e.Cancel = ( Application.OpenForms.OfType<SongsForm>().Count() <= 1 );
+                e.Cancel = ( Application.OpenForms.OfType<SongsForm>().Count() + Application.OpenForms.OfType<SongsFormTree>().Count() <= 1 );
         }
 
         private void toolStripContainer1_SizeChange(object sender, EventArgs e)

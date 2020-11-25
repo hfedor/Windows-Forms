@@ -23,6 +23,7 @@ namespace HubertFedorowiczPAINLab1
         private void SongsFormTree_Load(object sender, EventArgs e)
         {
             songsTreeView.Nodes.Clear();
+            UpdateItems();
             Document.AddSongEvent += Document_AddSongEvent;
             Document.RemoveSongEvent += Document_RemoveSongEvent;
         }
@@ -289,7 +290,7 @@ namespace HubertFedorowiczPAINLab1
         private void SongsFormTree_Closing(object sender, FormClosingEventArgs e)
         {
             if (e.CloseReason == CloseReason.UserClosing)
-                e.Cancel = (Application.OpenForms.OfType<SongsForm>().Count() <= 1);
+                e.Cancel = (Application.OpenForms.OfType<SongsForm>().Count() + Application.OpenForms.OfType<SongsFormTree>().Count() <= 1);
         }
     }
 }
