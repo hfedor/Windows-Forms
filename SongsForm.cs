@@ -10,11 +10,11 @@ using System.Windows.Forms;
 
 namespace HubertFedorowiczPAINLab1
 {
-    public partial class SongsForm : Form
+    public partial class SongsForm : Form // formularz listy
     {
         string filter = "2000";
 
-        private Document Document { get; set; }
+        private Document Document { get; set; } // dokument zawierający piosenki
 
         public SongsForm( Document document )
         {
@@ -25,23 +25,35 @@ namespace HubertFedorowiczPAINLab1
         private void SongsForm_Load(object sender, EventArgs e)
         {
             UpdateItems();
+
+            // zdarzenie przy dodawaniu/usuwaniu/edycji dokumentu
             Document.AddSongEvent += Document_AddSongEvent;
             Document.RemoveSongEvent += Document_RemoveSongEvent;
+            Document.EditSongEvent += Document_EditSongEvent;
+
+            // szerokości kolumn
             this.columnHeaderTitle.Width = this.toolStripContainer1.ContentPanel.Width/3;
             this.columnHeaderAuthor.Width = this.toolStripContainer1.ContentPanel.Width / 3;
             this.columnHeaderGenre.Width = this.toolStripContainer1.ContentPanel.Width / 3 - 85;
             this.songsCounter.Text = Document.songs.Count().ToString();
         }
 
-        private void Document_AddSongEvent(Song song)
+        private void Document_AddSongEvent(Song song) // dodanie piosenki do widoku
         {
             ListViewItem item = new ListViewItem();
             item.Tag = song;
             UpdateItem(item);
-            songsListView.Items.Add(item);
+            if (filterSignButton.Text == ">")
+            {
+                if (!filterButton.Checked || song.RecordingDate.Year > Int32.Parse(filterTextBox.Text))
+                    songsListView.Items.Add(item);
+            }
+            else
+                if (!filterButton.Checked || song.RecordingDate.Year < Int32.Parse(filterTextBox.Text))
+                    songsListView.Items.Add(item);
         }
 
-        private void Document_RemoveSongEvent(Song song)
+        private void Document_RemoveSongEvent(Song song) // usuwanie piosenki z widoku
         {
             var item = this.songsListView.Items.Cast<ListViewItem>()
                 .Where(i => (
@@ -55,14 +67,19 @@ namespace HubertFedorowiczPAINLab1
             songsListView.Items.Remove((ListViewItem)item);
         }
 
+        private void Document_EditSongEvent(Song song) // edycja piosenki z widoku
+        {
+            UpdateItems();
+        }
+
         private void addToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SongForm songForm = new SongForm(null, Document.songs);
-            if( songForm.ShowDialog() == DialogResult.OK)
+            if( songForm.ShowDialog() == DialogResult.OK) // przeslanie danych z formuklarza DODAWANIA
             {
                 Song newSong = new Song(songForm.SongTitle, songForm.SongAuthor, songForm.SongRecordingDay, songForm.SongGenre);
 
-                Document.AddSong(newSong);
+                Document.AddSong(newSong); // ODDANIE PIOSENKI DO FORMULARZA
 
                 this.songsCounter.Text = Document.songs.Count().ToString();
             }
@@ -73,6 +90,7 @@ namespace HubertFedorowiczPAINLab1
             if( songsListView.SelectedItems.Count == 1)
             {
                 Song song = (Song)songsListView.SelectedItems[0].Tag;
+                Song oldSong = song;
                 SongForm songForm = new SongForm(song, Document.songs);
                 if (songForm.ShowDialog() == DialogResult.OK)
                 {
@@ -80,6 +98,8 @@ namespace HubertFedorowiczPAINLab1
                     song.Author = songForm.SongAuthor;
                     song.RecordingDate = songForm.SongRecordingDay;
                     song.Genre = songForm.SongGenre;
+
+                    Document.EditSong(oldSong, song);
                 }
             }
         }
@@ -124,6 +144,7 @@ namespace HubertFedorowiczPAINLab1
                     if (!filterButton.Checked || song.RecordingDate.Year < Int32.Parse(filterTextBox.Text))
                         songsListView.Items.Add(item);
             }
+
             this.songsCounter.Text = Document.songs.Count().ToString();
         }
 
@@ -163,6 +184,7 @@ namespace HubertFedorowiczPAINLab1
                 filterButton.Checked = true;
                 filterTextBox.Visible = true;
                 filterSignButton.Visible = true;
+                UpdateItems();
             }
             UpdateItems();
         }

@@ -26,6 +26,7 @@ namespace HubertFedorowiczPAINLab1
             UpdateItems();
             Document.AddSongEvent += Document_AddSongEvent;
             Document.RemoveSongEvent += Document_RemoveSongEvent;
+            Document.EditSongEvent += Document_EditSongEvent;
         }
 
         private void Document_AddSongEvent(Song song)
@@ -98,6 +99,11 @@ namespace HubertFedorowiczPAINLab1
             }
 
             songsTreeView.EndUpdate();
+        }
+
+        private void Document_EditSongEvent(Song oldSong)
+        {
+            UpdateItems();
         }
 
         private void Document_RemoveSongEvent(Song song)
@@ -227,7 +233,46 @@ namespace HubertFedorowiczPAINLab1
 
         private void editToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            
+            SongForm songForm = new SongForm(null, Document.songs);
+            if (songForm.ShowDialog() == DialogResult.OK)
+            {
+                Song newSong = new Song(songForm.SongTitle, songForm.SongAuthor, songForm.SongRecordingDay, songForm.SongGenre);
+
+                if (songsTreeView.SelectedNode != null)
+                {
+                    TreeNode node = songsTreeView.SelectedNode;
+                    int i = 0;
+                    while (node.Parent != null)
+                    {
+                        node = node.Parent;
+                        i++;
+                    }
+                    node = songsTreeView.SelectedNode;
+
+                    switch (i)
+                    {
+                        case 0:
+                            //Document.EditSong(node.Text);
+                            break;
+                        case 1:
+                           // Document.EditSong(node.Parent.Text, node.Text);
+                            break;
+                        case 2:
+                            //Document.EditSong(node.Parent.Parent.Text, node.Parent.Text, node.Text);
+                            break;
+                        case 3:
+                            //Document.EditSong(node.Parent.Parent.Parent.Text, node.Parent.Parent.Text, node.Parent.Text, node.Text);
+                            break;
+                    }
+
+                    TreeNode parent = node.Parent;
+                    node.Remove();
+                    if (parent != null)
+                        deleteEmptyParrents(parent);
+                }
+
+                //Document.EditSong(newSong);
+            }
         }
 
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
